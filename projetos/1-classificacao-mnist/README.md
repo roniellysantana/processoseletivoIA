@@ -102,9 +102,9 @@ O treinamento foi realizado em CPU, por até 15 épocas, utilizando o otimizador
 As principais bibliotecas utilizadas foram:
 
 - Python 3.11;
-- TensorFlow 2.21.0;
-- Keras 3.15.0;
-- NumPy 2.4.0.
+- TensorFlow 2.20.0;
+- Keras 3.11.3;
+- NumPy 2.2.6.
 
 ### 3️⃣ Técnica de Otimização do Modelo
 
