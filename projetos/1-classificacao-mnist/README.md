@@ -114,7 +114,7 @@ Essa técnica quantiza principalmente os pesos do modelo, reduzindo o tamanho do
 
 ### 4️⃣ Resultados Obtidos
 
-A acurácia final no conjunto de validação foi de 99,08%.
+A acurácia final no conjunto de validação foi de 98,84%.
 
 Os tamanhos obtidos foram:
 

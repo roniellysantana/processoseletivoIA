@@ -17,7 +17,11 @@ def carregar_dados():
     """Carrega, normaliza e separa os dados de treino e validação."""
     (x_train, y_train), _ = keras.datasets.mnist.load_data()
 
+    # Normalização das imagens para valores entre 0 e 1.
     x_train = x_train.astype("float32") / 255.0
+
+    # Adiciona o canal das imagens em escala de cinza:
+    # (28, 28) passa para (28, 28, 1).
     x_train = np.expand_dims(x_train, axis=-1)
 
     # Embaralhamento reproduzível antes da separação.
@@ -29,6 +33,7 @@ def carregar_dados():
     # 55.000 imagens para treino e 5.000 para validação.
     x_val = x_train[-5000:]
     y_val = y_train[-5000:]
+
     x_train = x_train[:-5000]
     y_train = y_train[:-5000]
 
@@ -36,27 +41,57 @@ def carregar_dados():
 
 
 def construir_modelo():
-    """Constrói uma CNN simples para classificação dos dígitos."""
+    """Constrói uma CNN para classificação dos dígitos do MNIST."""
     model = keras.Sequential(
         [
             layers.Input(shape=(28, 28, 1)),
 
-            layers.Conv2D(32, (3, 3), padding="same", activation="relu"),
+            # Primeiro bloco convolucional.
+            layers.Conv2D(
+                32,
+                (3, 3),
+                padding="same",
+                activation="relu",
+                kernel_initializer="random_normal",
+            ),
             layers.BatchNormalization(),
             layers.MaxPooling2D((2, 2)),
 
-            layers.Conv2D(64, (3, 3), padding="same", activation="relu"),
+            # Segundo bloco convolucional.
+            layers.Conv2D(
+                64,
+                (3, 3),
+                padding="same",
+                activation="relu",
+                kernel_initializer="random_normal",
+            ),
             layers.BatchNormalization(),
             layers.MaxPooling2D((2, 2)),
 
-            layers.Conv2D(128, (3, 3), padding="same", activation="relu"),
+            # Terceiro bloco convolucional.
+            layers.Conv2D(
+                128,
+                (3, 3),
+                padding="same",
+                activation="relu",
+                kernel_initializer="random_normal",
+            ),
             layers.BatchNormalization(),
             layers.MaxPooling2D((2, 2)),
 
+            # Camadas finais de classificação.
             layers.Flatten(),
-            layers.Dense(64, activation="relu"),
+            layers.Dense(
+                64,
+                activation="relu",
+                kernel_initializer="random_normal",
+            ),
             layers.Dropout(0.4),
-            layers.Dense(10, activation="softmax"),
+            layers.Dense(
+                10,
+                activation="softmax",
+                kernel_initializer="random_normal",
+            ),
         ]
     )
 
@@ -70,11 +105,14 @@ def construir_modelo():
 
 
 def main():
+    # Semente fixa para tornar o treinamento reproduzível.
     tf.keras.utils.set_random_seed(SEED)
 
     x_train, y_train, x_val, y_val = carregar_dados()
     model = construir_modelo()
 
+    # Interrompe o treinamento quando a perda de validação
+    # deixar de melhorar por três épocas consecutivas.
     early_stopping = keras.callbacks.EarlyStopping(
         monitor="val_loss",
         patience=3,
@@ -91,12 +129,18 @@ def main():
         verbose=2,
     )
 
-    val_loss, val_accuracy = model.evaluate(x_val, y_val, verbose=0)
+    val_loss, val_accuracy = model.evaluate(
+        x_val,
+        y_val,
+        verbose=0,
+    )
+
     print(f"\nPerda final de validacao: {val_loss:.4f}")
     print(f"Acuracia final de validacao: {val_accuracy:.2%}")
 
     script_dir = os.path.dirname(os.path.abspath(__file__))
     model_path = os.path.join(script_dir, "model.h5")
+
     model.save(model_path)
 
     print(f"Modelo salvo em: {model_path}")
